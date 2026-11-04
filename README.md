@@ -1,59 +1,113 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Sistema de inventario de equipos tecnológicos
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Aplicación web en **Laravel 12** y **MySQL** para que una empresa controle sus computadores, impresoras y demás dispositivos tecnológicos, organizados por categorías.
 
-## About Laravel
+Evaluación Laravel – Grupo 1, Ejercicio 1.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Módulos (CRUD)
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+| Módulo | Campos | Operaciones |
+|---|---|---|
+| **Equipos tecnológicos** | código, nombre, marca, modelo, número de serie, estado (disponible, asignado, mantenimiento), fecha de adquisición, categoría | crear, consultar (tabla con búsqueda y filtro por categoría), ver detalle, editar, eliminar con confirmación |
+| **Categorías de equipos** | nombre, descripción, ubicación, estado (activa, inactiva) | crear, consultar (tabla con número de equipos), ver detalle con sus equipos, editar, eliminar con confirmación |
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+**Relación:** cada equipo pertenece a una categoría (`equipos.categoria_id` → `categorias.id`, clave foránea). Una categoría que todavía tiene equipos no se puede eliminar: el sistema muestra un mensaje de error y la base de datos también lo impide (`ON DELETE RESTRICT`).
 
-## Learning Laravel
+### Validaciones
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+- Todos los campos marcados con `*` son obligatorios.
+- Código del equipo, número de serie y nombre de categoría no se pueden repetir.
+- El estado solo acepta los valores de la lista.
+- La fecha de adquisición debe ser una fecha válida y no puede ser futura.
+- La categoría elegida debe existir.
+- Los mensajes de validación, éxito y error se muestran en español.
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## Tecnologías
 
-## Laravel Sponsors
+- PHP 8.2 o superior
+- Laravel 12
+- MySQL / MariaDB (XAMPP)
+- Bootstrap 5.3 y Bootstrap Icons (por CDN, no requiere `npm`)
+- PHPUnit para las pruebas y GitHub Actions para ejecutarlas en cada push
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+## Instalación
 
-### Premium Partners
+Requisitos: PHP 8.2+, Composer, Git y MySQL (por ejemplo, XAMPP con MySQL encendido).
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+```bash
+# 1. Clonar el repositorio
+git clone https://github.com/<usuario>/inventario-equipos.git
+cd inventario-equipos
 
-## Contributing
+# 2. Instalar dependencias de PHP
+composer install
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+# 3. Crear el archivo de entorno y la llave de la aplicación
+cp .env.example .env        # en Windows (cmd): copy .env.example .env
+php artisan key:generate
+```
 
-## Code of Conduct
+4. Crear la base de datos vacía `inventario_equipos` en phpMyAdmin (cotejamiento `utf8mb4_unicode_ci`) o con:
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+```sql
+CREATE DATABASE inventario_equipos CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+```
 
-## Security Vulnerabilities
+5. Revisar en `.env` los datos de conexión (los de XAMPP vienen por defecto):
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+```env
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=inventario_equipos
+DB_USERNAME=root
+DB_PASSWORD=
+```
 
-## License
+6. Crear las tablas y cargar los datos de prueba, y arrancar el servidor:
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+```bash
+php artisan migrate --seed
+php artisan serve
+```
+
+Abrir <http://127.0.0.1:8000>.
+
+Para volver a dejar la base de datos con los datos de prueba originales: `php artisan migrate:fresh --seed`.
+
+## Datos de prueba
+
+El seeder (`database/seeders/DatabaseSeeder.php`) registra 5 categorías (Computadores, Impresoras, Redes y conectividad, Audiovisuales y Periféricos) y 13 equipos con marcas, modelos y números de serie de ejemplo.
+
+## Pruebas
+
+```bash
+php artisan test
+```
+
+Las pruebas (`tests/Feature`) cubren las cuatro operaciones de cada CRUD, las validaciones y la regla de no eliminar categorías con equipos. En local usan SQLite en memoria; en GitHub Actions (`.github/workflows/tests.yml`) se ejecutan contra un servicio de **MySQL 8** en cada push y pull request a `main` y `develop`.
+
+## Estructura principal
+
+```
+app/Http/Controllers/CategoriaController.php
+app/Http/Controllers/EquipoController.php
+app/Http/Requests/CategoriaRequest.php     # reglas de validación
+app/Http/Requests/EquipoRequest.php
+app/Models/Categoria.php                   # hasMany equipos
+app/Models/Equipo.php                      # belongsTo categoria
+database/migrations/                       # tablas categorias y equipos
+database/seeders/DatabaseSeeder.php        # datos de prueba
+resources/views/layouts/                   # plantilla Bootstrap, menú y alertas
+resources/views/categorias/                # vistas del CRUD de categorías
+resources/views/equipos/                   # vistas del CRUD de equipos
+routes/web.php                             # Route::resource de ambos módulos
+tests/Feature/                             # pruebas automatizadas
+```
+
+## Flujo de trabajo con Git
+
+- `main`: versión estable.
+- `develop`: integración de los avances.
+- Los cambios se hacen en `develop` (o en ramas `feature/...`) y se integran a `main` mediante Pull Requests.
+- El archivo `.env`, las contraseñas y la carpeta `vendor` no se suben al repositorio (ver `.gitignore`).
