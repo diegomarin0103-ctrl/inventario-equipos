@@ -46,7 +46,7 @@
                 <tbody>
                     @forelse ($equipos as $equipo)
                         <tr>
-                            <td class="fw-semibold">{{ $equipo->codigo }}</td>
+                            <td class="fw-semibold text-nowrap">{{ $equipo->codigo }}</td>
                             <td>{{ $equipo->nombre }}</td>
                             <td><a href="{{ route('categorias.show', $equipo->categoria) }}" class="text-decoration-none">{{ $equipo->categoria->nombre }}</a></td>
                             <td>{{ $equipo->marca }} <span class="text-muted">{{ $equipo->modelo }}</span></td>
