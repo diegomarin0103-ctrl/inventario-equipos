@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Equipo extends Model
 {
@@ -26,6 +27,7 @@ class Equipo extends Model
         'numero_serie',
         'estado',
         'fecha_adquisicion',
+        'categoria_id',
     ];
 
     protected function casts(): array
@@ -33,6 +35,12 @@ class Equipo extends Model
         return [
             'fecha_adquisicion' => 'date',
         ];
+    }
+
+    /** Cada equipo pertenece a una categoría. */
+    public function categoria(): BelongsTo
+    {
+        return $this->belongsTo(Categoria::class);
     }
 
     /** Clase de Bootstrap para pintar el estado. */

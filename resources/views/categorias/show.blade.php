@@ -29,4 +29,34 @@
             </dl>
         </div>
     </div>
+
+    <h2 class="h5 mb-3">Equipos de esta categoría ({{ $equipos->count() }})</h2>
+    <div class="card shadow-sm">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Código</th>
+                        <th>Nombre</th>
+                        <th>Marca / Modelo</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse ($equipos as $equipo)
+                        <tr>
+                            <td><a href="{{ route('equipos.show', $equipo) }}">{{ $equipo->codigo }}</a></td>
+                            <td>{{ $equipo->nombre }}</td>
+                            <td>{{ $equipo->marca }} {{ $equipo->modelo }}</td>
+                            <td><span class="badge text-bg-{{ $equipo->colorEstado() }}">{{ \App\Models\Equipo::ESTADOS[$equipo->estado] ?? $equipo->estado }}</span></td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="4" class="text-center text-muted py-4">Esta categoría todavía no tiene equipos.</td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </div>
 @endsection

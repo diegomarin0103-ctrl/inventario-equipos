@@ -28,6 +28,7 @@
                         <th>Nombre</th>
                         <th>Descripción</th>
                         <th>Ubicación</th>
+                        <th class="text-center">Equipos</th>
                         <th>Estado</th>
                         <th class="text-end">Acciones</th>
                     </tr>
@@ -38,6 +39,7 @@
                             <td class="fw-semibold">{{ $categoria->nombre }}</td>
                             <td class="text-muted">{{ \Illuminate\Support\Str::limit($categoria->descripcion, 60) ?: '—' }}</td>
                             <td>{{ $categoria->ubicacion }}</td>
+                            <td class="text-center"><a href="{{ route('equipos.index', ['categoria_id' => $categoria->id]) }}" class="badge rounded-pill text-bg-light border text-decoration-none">{{ $categoria->equipos_count }}</a></td>
                             <td>
                                 <span class="badge text-bg-{{ $categoria->estado === 'activa' ? 'success' : 'secondary' }}">
                                     {{ \App\Models\Categoria::ESTADOS[$categoria->estado] ?? $categoria->estado }}
@@ -56,7 +58,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5" class="text-center text-muted py-4">No hay categorías registradas.</td>
+                            <td colspan="6" class="text-center text-muted py-4">No hay categorías registradas.</td>
                         </tr>
                     @endforelse
                 </tbody>

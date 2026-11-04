@@ -8,6 +8,7 @@ return new class extends Migration
 {
     /**
      * Crea la tabla de equipos tecnológicos.
+     * Cada equipo pertenece a una categoría (clave foránea categoria_id).
      */
     public function up(): void
     {
@@ -20,6 +21,8 @@ return new class extends Migration
             $table->string('numero_serie', 80)->unique();
             $table->enum('estado', ['disponible', 'asignado', 'mantenimiento'])->default('disponible');
             $table->date('fecha_adquisicion');
+            // Relación: no se permite borrar una categoría que todavía tenga equipos.
+            $table->foreignId('categoria_id')->constrained('categorias')->restrictOnDelete();
             $table->timestamps();
         });
     }

@@ -9,12 +9,20 @@
     </div>
 
     <form method="GET" action="{{ route('equipos.index') }}" class="row g-2 mb-3">
-        <div class="col-sm-8 col-md-6">
+        <div class="col-sm-6 col-md-5">
             <input type="search" name="buscar" value="{{ $buscar }}" class="form-control" placeholder="Buscar por código, nombre, marca o serie">
+        </div>
+        <div class="col-sm-4 col-md-3">
+            <select name="categoria_id" class="form-select" aria-label="Filtrar por categoría">
+                <option value="">Todas las categorías</option>
+                @foreach ($categorias as $categoria)
+                    <option value="{{ $categoria->id }}" @selected($categoriaId == $categoria->id)>{{ $categoria->nombre }}</option>
+                @endforeach
+            </select>
         </div>
         <div class="col-auto">
             <button class="btn btn-outline-secondary"><i class="bi bi-search"></i> Buscar</button>
-            @if ($buscar)
+            @if ($buscar || $categoriaId)
                 <a href="{{ route('equipos.index') }}" class="btn btn-link">Limpiar</a>
             @endif
         </div>
@@ -27,6 +35,7 @@
                     <tr>
                         <th>Código</th>
                         <th>Nombre</th>
+                        <th>Categoría</th>
                         <th>Marca / Modelo</th>
                         <th>N.º de serie</th>
                         <th>Estado</th>
@@ -39,6 +48,7 @@
                         <tr>
                             <td class="fw-semibold">{{ $equipo->codigo }}</td>
                             <td>{{ $equipo->nombre }}</td>
+                            <td><a href="{{ route('categorias.show', $equipo->categoria) }}" class="text-decoration-none">{{ $equipo->categoria->nombre }}</a></td>
                             <td>{{ $equipo->marca }} <span class="text-muted">{{ $equipo->modelo }}</span></td>
                             <td><code>{{ $equipo->numero_serie }}</code></td>
                             <td><span class="badge text-bg-{{ $equipo->colorEstado() }}">{{ \App\Models\Equipo::ESTADOS[$equipo->estado] ?? $equipo->estado }}</span></td>
@@ -56,7 +66,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7" class="text-center text-muted py-4">No hay equipos registrados.</td>
+                            <td colspan="8" class="text-center text-muted py-4">No hay equipos registrados.</td>
                         </tr>
                     @endforelse
                 </tbody>

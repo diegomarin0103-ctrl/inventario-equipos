@@ -16,6 +16,22 @@
         @error('nombre') <div class="invalid-feedback">{{ $message }}</div> @enderror
     </div>
 
+    <div class="col-md-12">
+        <label for="categoria_id" class="form-label">Categoría *</label>
+        <select id="categoria_id" name="categoria_id" required class="form-select @error('categoria_id') is-invalid @enderror">
+            <option value="">Seleccione una categoría…</option>
+            @foreach ($categorias as $categoria)
+                <option value="{{ $categoria->id }}" @selected(old('categoria_id', $equipo->categoria_id) == $categoria->id)>
+                    {{ $categoria->nombre }} — {{ $categoria->ubicacion }}
+                </option>
+            @endforeach
+        </select>
+        @error('categoria_id') <div class="invalid-feedback">{{ $message }}</div> @enderror
+        @if ($categorias->isEmpty())
+            <div class="form-text text-danger">No hay categorías activas. <a href="{{ route('categorias.create') }}">Registra una categoría</a> primero.</div>
+        @endif
+    </div>
+
     <div class="col-md-4">
         <label for="marca" class="form-label">Marca *</label>
         <input type="text" id="marca" name="marca" maxlength="60" required

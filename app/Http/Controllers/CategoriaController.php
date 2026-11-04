@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\CategoriaRequest;
 use App\Models\Categoria;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -9,15 +10,17 @@ use Illuminate\View\View;
 
 class CategoriaController extends Controller
 {
-    /** Consultar: lista de categorías con búsqueda y paginación. */
+    /** Consultar: lista de categorías con el número de equipos de cada una. */
     public function index(Request $request): View
     {
         $buscar = $request->query('buscar');
 
-        $categorias = Categoria::query()
+        $categorias = Categoria::withCount('equipos')
             ->when($buscar, function ($query, $buscar) {
-                $query->where('nombre', 'like', "%{$buscar}%")
-                    ->orWhere('ubicacion', 'like', "%{$buscar}%");
+                $query->where(function ($q) use ($buscar) {
+                    $q->where('nombre', 'like', "%{$buscar}%")
+                        ->orWhere('ubicacion', 'like', "%{$buscar}%");
+                });
             })
             ->orderBy('nombre')
             ->paginate(10)
@@ -32,19 +35,20 @@ class CategoriaController extends Controller
     }
 
     /** Crear: guarda una categoría nueva en MySQL. */
-    public function store(Request $request): RedirectResponse
+    public function store(CategoriaRequest $request): RedirectResponse
     {
-        $datos = $request->validate($this->reglas());
-
-        Categoria::create($datos);
+        Categoria::create($request->validated());
 
         return redirect()->route('categorias.index')
             ->with('success', 'Categoría registrada correctamente.');
     }
 
+    /** Detalle de la categoría con la lista de sus equipos. */
     public function show(Categoria $categoria): View
     {
-        return view('categorias.show', compact('categoria'));
+        $equipos = $categoria->equipos()->orderBy('codigo')->get();
+
+        return view('categorias.show', compact('categoria', 'equipos'));
     }
 
     public function edit(Categoria $categoria): View
@@ -53,32 +57,30 @@ class CategoriaController extends Controller
     }
 
     /** Actualizar: modifica una categoría existente. */
-    public function update(Request $request, Categoria $categoria): RedirectResponse
+    public function update(CategoriaRequest $request, Categoria $categoria): RedirectResponse
     {
-        $datos = $request->validate($this->reglas());
-
-        $categoria->update($datos);
+        $categoria->update($request->validated());
 
         return redirect()->route('categorias.index')
             ->with('success', 'Categoría actualizada correctamente.');
     }
 
-    /** Eliminar: borra la categoría (la confirmación se pide en la vista). */
+    /**
+     * Eliminar: solo se permite si la categoría no tiene equipos asociados
+     * (la base de datos también lo impide con la clave foránea).
+     */
     public function destroy(Categoria $categoria): RedirectResponse
     {
+        $total = $categoria->equipos()->count();
+
+        if ($total > 0) {
+            return redirect()->route('categorias.index')
+                ->with('error', "No se puede eliminar la categoría {$categoria->nombre} porque tiene {$total} equipo(s) asociado(s).");
+        }
+
         $categoria->delete();
 
         return redirect()->route('categorias.index')
-            ->with('success', 'Categoría eliminada correctamente.');
-    }
-
-    private function reglas(): array
-    {
-        return [
-            'nombre' => ['required', 'string', 'max:100'],
-            'descripcion' => ['nullable', 'string', 'max:500'],
-            'ubicacion' => ['required', 'string', 'max:150'],
-            'estado' => ['required'],
-        ];
+            ->with('success', "Categoría {$categoria->nombre} eliminada correctamente.");
     }
 }

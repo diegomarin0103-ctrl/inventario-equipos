@@ -17,6 +17,12 @@
                 <dt class="col-sm-4">Código</dt>
                 <dd class="col-sm-8">{{ $equipo->codigo }}</dd>
 
+                <dt class="col-sm-4">Categoría</dt>
+                <dd class="col-sm-8">
+                    <a href="{{ route('categorias.show', $equipo->categoria) }}">{{ $equipo->categoria->nombre }}</a>
+                    <span class="text-muted">({{ $equipo->categoria->ubicacion }})</span>
+                </dd>
+
                 <dt class="col-sm-4">Marca</dt>
                 <dd class="col-sm-8">{{ $equipo->marca }}</dd>
 
